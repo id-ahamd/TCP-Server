@@ -17,7 +17,7 @@
 
 long size_fichier(FILE *f){
 	fseek(f,0,SEEK_END);
-  return ftell(f);
+  	return ftell(f);
 }
 
 long number_of_frames(int size){
@@ -31,7 +31,7 @@ long measure_rtt(long start, long cur, long rtt)
 { 
   long cur_rtt =cur-start;
   long new_rtt;
-  if(rtt == 0)
+  if (rtt == 0)
   {
     // first measurement
     new_rtt = cur_rtt;
@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
 	struct sockaddr_in servaddr_conx, servaddr_msg,cliaddr1,cliaddr2;
 	char buffer_conx[RCVSIZE]; 
 	char syn[]="SYN"; 
-  char syn_ack[]="SYN-ACK9000";/////attention cas multi-clients
-  char ack[]="ACK";
+  	char syn_ack[]="SYN-ACK9000";/////attention cas multi-clients
+  	char ack[]="ACK";
 	char fin[]="FIN";
 	char nom_fichier[100];
 	FILE *file;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	// Envoie de SYN-ACK avec le numéro de port résevé aux messages
 	if (strcmp(buffer_conx,syn)==0){
 		printf("SYN received\n"); 
-  	sendto(sockfd_conx, (const char *)syn_ack, strlen(syn_ack),MSG_CONFIRM, (const struct sockaddr *) &cliaddr1,len);
+  		sendto(sockfd_conx, (const char *)syn_ack, strlen(syn_ack),MSG_CONFIRM, (const struct sockaddr *) &cliaddr1,len);
 		printf("SYN-ACK sent from server\n"); 
 	}
 	else return(0); // avec while continu
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
 	// Création d'un child process qui se chargera de l'échange des données
 	int fils = fork();
 	if (fils == -1) {              
-    perror("erreur de création du child process");           
-    exit(EXIT_FAILURE);       
-    }
+    		perror("erreur de création du child process");           
+    		exit(EXIT_FAILURE);       
+    	}
 	else if (fils >0){
 		memset(&buffer_conx, 0, sizeof(buffer_conx));
 		recvfrom(sockfd_conx, (char *)buffer_conx, RCVSIZE,MSG_WAITALL, ( struct sockaddr *) &cliaddr1,&len);
@@ -137,104 +137,104 @@ int main(int argc, char *argv[])
 		int len2 = sizeof(cliaddr1);
 		recvfrom(sockfd_msg, (char *)nom_fichier, 100,MSG_WAITALL, ( struct sockaddr *) &cliaddr2,&len2);
 		file=fopen(nom_fichier,"rb");
-    if (file == NULL) 
-    { 
-      printf("Ouverture du fichier impossible"); 
-      exit(0);
-    }
-		else{ 
-			memset(nom_fichier, 0, sizeof(nom_fichier)); 
-		}
+    	if (file == NULL) 
+    	{ 
+      		printf("Ouverture du fichier impossible"); 
+      		exit(0);
+    	}
+	else{ 
+		memset(nom_fichier, 0, sizeof(nom_fichier)); 
+	}
 		
-		// taille du fichier	
-		int taille=size_fichier(file); 
-		fseek(file, 0L, SEEK_SET);
-		// Nombre de packets nécessaires
-		int total_seg=number_of_frames(taille);
-		float ssthresh=80, flight_size; float window=1;
-		int num_seq_courant=0;
-		int dernier_num_seg_aquitte=0,dernier_num_seg_aquitte_prec=0;
-		char segment_utile[pack_size];
-		char *segment;
-		char aquittement[10];
-		fd_set rdset, wrset;
-		int numero_aquitement;
-		int i=1;
-		char c[7];
-		char d[7];
-		struct timeval tv;
-		tv.tv_sec = 0;
-    tv.tv_usec = 0;
-		int borne_sup_w=0;
-		int flag=1;
-		struct timeval start, end,tx_time, time_now,now_boucle;
-		int m=0;
-		long int temp_transfert;
-		long timeout; //timeout
-		int flag2=0, flag_ack=0;
-		long rtt = 0; // in micro s
-		int nbre_tout=0;
-		long instants_tx[total_seg+1]; 
-		char flags_rtx[total_seg+1];
-		memset(flags_rtx, 0, sizeof(flags_rtx));
-		memset(instants_tx, 0, sizeof(instants_tx));
-		int r,x=1, nbre_rtx=0,nbre_rtx_wile=0, comp=0;
-		long position_file;int b=0, duplique=0;
-		while(dernier_num_seg_aquitte!=total_seg){		
+	// taille du fichier	
+	int taille=size_fichier(file); 
+	fseek(file, 0L, SEEK_SET);
+	// Nombre de packets nécessaires
+	int total_seg=number_of_frames(taille);
+	float ssthresh=80, flight_size; float window=1;
+	int num_seq_courant=0;
+	int dernier_num_seg_aquitte=0,dernier_num_seg_aquitte_prec=0;
+	char segment_utile[pack_size];
+	char *segment;
+	char aquittement[10];
+	fd_set rdset, wrset;
+	int numero_aquitement;
+	int i=1;
+	char c[7];
+	char d[7];
+	struct timeval tv;
+	tv.tv_sec = 0;
+    	tv.tv_usec = 0;
+	int borne_sup_w=0;
+	int flag=1;
+	struct timeval start, end,tx_time, time_now,now_boucle;
+	int m=0;
+	long int temp_transfert;
+	long timeout; //timeout
+	int flag2=0, flag_ack=0;
+	long rtt = 0; // in micro s
+	int nbre_tout=0;
+	long instants_tx[total_seg+1]; 
+	char flags_rtx[total_seg+1];
+	memset(flags_rtx, 0, sizeof(flags_rtx));
+	memset(instants_tx, 0, sizeof(instants_tx));
+	int r,x=1, nbre_rtx=0,nbre_rtx_wile=0, comp=0;
+	long position_file;int b=0, duplique=0;
+	while(dernier_num_seg_aquitte!=total_seg){		
 
-			if (flag==1) {timeout=50000;}
-			else {timeout=2*rtt; }//micro s
+		if (flag==1) {timeout=50000;}
+		else {timeout=2*rtt; }//micro s
 
-			if (flag_ack==1) {
-				flag_ack=0;
-				recvfrom(sockfd_msg, (char *)aquittement, sizeof(aquittement),MSG_WAITALL, ( struct sockaddr *)&cliaddr2,&len2);
-				memcpy(c,aquittement+sizeof(ack)-1, sizeof(c));
-				numero_aquitement=atoi(c);
+		if (flag_ack==1) {
+			flag_ack=0;
+			recvfrom(sockfd_msg, (char *)aquittement, sizeof(aquittement),MSG_WAITALL, ( struct sockaddr *)&cliaddr2,&len2);
+			memcpy(c,aquittement+sizeof(ack)-1, sizeof(c));
+			numero_aquitement=atoi(c);
 					
-				if (numero_aquitement>dernier_num_seg_aquitte) {
-					if (window > ssthresh){ window+=(numero_aquitement-dernier_num_seg_aquitte)/window;}
-					else {window+=numero_aquitement-dernier_num_seg_aquitte;}
-					dernier_num_seg_aquitte=numero_aquitement;
-					x=0;flag2=1;
-				}
-				gettimeofday(&time_now, NULL);
-				long now=time_now.tv_sec * 1000000 + time_now.tv_usec;
-
-				if (flags_rtx[numero_aquitement]!=1 && dernier_num_seg_aquitte>=borne_sup_w){ //RTT update
-					flag=0;
-					rtt=measure_rtt(instants_tx[numero_aquitement],now,rtt);
-				}
-				
-				if (numero_aquitement==dernier_num_seg_aquitte) { //Fast retransmit
-					if (x==0) {comp=0;x=1;}
-					comp++;
-					if (comp==4) {
-						flight_size=window;
-						ssthresh= flight_size/2;
-						window= ssthresh+ 40;
-						duplique++;
-						gettimeofday(&now_boucle, NULL);
-						long now=now_boucle.tv_sec * 1000000 + now_boucle.tv_usec;
-						memset(segment_utile, 0, sizeof(segment_utile));
-						fseek(file,(dernier_num_seg_aquitte)*pack_size ,SEEK_SET);
-						r=fread(segment_utile, 1, pack_size, file);
-						segment= (char *)calloc(r+6, sizeof(char));
-						memset(segment, 0, sizeof(segment));
-						memset(d, 0, sizeof(d));
-						sprintf(d,"%06d",dernier_num_seg_aquitte+1);
-						memcpy(segment,d,6);
-            memcpy(segment+6,segment_utile,r);
-						sendto(sockfd_msg, (const char *)segment, r+6,MSG_CONFIRM, (const struct sockaddr *)&cliaddr2,len2);
-						instants_tx[dernier_num_seg_aquitte+1]=now;
-						fseek(file,position_file ,SEEK_SET);
-						comp=0;
-					}	
-				}	
+			if (numero_aquitement>dernier_num_seg_aquitte) {
+				if (window > ssthresh){ window+=(numero_aquitement-dernier_num_seg_aquitte)/window;}
+				else {window+=numero_aquitement-dernier_num_seg_aquitte;}
+				dernier_num_seg_aquitte=numero_aquitement;
+				x=0;flag2=1;
 			}
+			gettimeofday(&time_now, NULL);
+			long now=time_now.tv_sec * 1000000 + time_now.tv_usec;
 
-			if (flag2==1 ){ //ACK utile
-				borne_sup_w=dernier_num_seg_aquitte+1;flag2=0;//dernier_num_seg_aquitte_prec=dernier_num_seg_aquitte;
-				if (num_seq_courant<=dernier_num_seg_aquitte) {
+			if (flags_rtx[numero_aquitement]!=1 && dernier_num_seg_aquitte>=borne_sup_w){ //RTT update
+				flag=0;
+				rtt=measure_rtt(instants_tx[numero_aquitement],now,rtt);
+			}
+				
+			if (numero_aquitement==dernier_num_seg_aquitte) { //Fast retransmit
+				if (x==0) {comp=0;x=1;}
+				comp++;
+				if (comp==4) {
+					flight_size=window;
+					ssthresh= flight_size/2;
+					window= ssthresh+ 40;
+					duplique++;
+					gettimeofday(&now_boucle, NULL);
+					long now=now_boucle.tv_sec * 1000000 + now_boucle.tv_usec;
+					memset(segment_utile, 0, sizeof(segment_utile));
+					fseek(file,(dernier_num_seg_aquitte)*pack_size ,SEEK_SET);
+					r=fread(segment_utile, 1, pack_size, file);
+					segment= (char *)calloc(r+6, sizeof(char));
+					memset(segment, 0, sizeof(segment));
+					memset(d, 0, sizeof(d));
+					sprintf(d,"%06d",dernier_num_seg_aquitte+1);
+					memcpy(segment,d,6);
+            				memcpy(segment+6,segment_utile,r);
+					sendto(sockfd_msg, (const char *)segment, r+6,MSG_CONFIRM, (const struct sockaddr *)&cliaddr2,len2);
+					instants_tx[dernier_num_seg_aquitte+1]=now;
+					fseek(file,position_file ,SEEK_SET);
+					comp=0;
+				}	
+			}	
+		}
+
+		if (flag2==1 ){ //ACK utile
+			borne_sup_w=dernier_num_seg_aquitte+1;flag2=0;//dernier_num_seg_aquitte_prec=dernier_num_seg_aquitte;
+			if (num_seq_courant<=dernier_num_seg_aquitte) {
 				num_seq_courant=dernier_num_seg_aquitte+1;
 				fseek(file,dernier_num_seg_aquitte*pack_size ,SEEK_SET);
 				}	
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 						memset(d, 0, sizeof(d));
 						sprintf(d,"%06d", k);
 						memcpy(segment,d,6);
-            memcpy(segment+6,segment_utile,r);
+            					memcpy(segment+6,segment_utile,r);
 						sendto(sockfd_msg, (const char *)segment, r+6,MSG_CONFIRM, (const struct sockaddr *)&cliaddr2,len2);
 						flags_rtx[k]=1; //le paquet retransmis est non utilisé pour RTT update
 						
@@ -282,11 +282,11 @@ int main(int argc, char *argv[])
 				memset(d, 0, sizeof(d));
 				sprintf(d,"%06d", num_seq_courant);
 				memcpy(segment,d,6);
-        memcpy(segment+6,segment_utile,r);
+        			memcpy(segment+6,segment_utile,r);
 				
 				sendto(sockfd_msg, (const char *)segment, r+6,MSG_CONFIRM, (const struct sockaddr *) &cliaddr2,len2);   
 				
-   			gettimeofday(&tx_time, NULL);
+   				gettimeofday(&tx_time, NULL);
 				instants_tx[num_seq_courant]=tx_time.tv_sec * 1000000 + tx_time.tv_usec;
 				position_file=ftell(file);
 				gettimeofday(&now_boucle, NULL);
@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 						memset(d, 0, sizeof(d));
 						sprintf(d,"%06d", k);
 						memcpy(segment,d,6);
-            memcpy(segment+6,segment_utile,r);
+            					memcpy(segment+6,segment_utile,r);
 						sendto(sockfd_msg, (const char *)segment, r+6,MSG_CONFIRM, (const struct sockaddr *)&cliaddr2,len2);
 						
 						flags_rtx[k]=1; //le paquet retransmis est non utilisé pour RTT update
@@ -326,11 +326,9 @@ int main(int argc, char *argv[])
 		sendto(sockfd_msg, (const char *)fin, strlen(fin),MSG_CONFIRM, (const struct sockaddr *) &cliaddr1,len);
 		fclose(file);
 		close(sockfd_msg);
-    exit(0);				
-	}	
-						
+    	exit(0);				
+	}					
 	return(0);
-		
 }
 
 
